@@ -12,6 +12,18 @@ const ProjectSchema = new mongoose.Schema({
   desc: {
     type: String,
     required: true,
+  },
+  project_image: {
+    type: String,
+    default:'',
+  },
+  images: {
+    type: [String],
+    default:[],
+  },
+  audios: {
+    type: [String],
+    default: [],
   }
 });
 

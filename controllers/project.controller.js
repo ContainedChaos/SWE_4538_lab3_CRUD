@@ -35,10 +35,13 @@ if (errors.length > 0) {
 
 const getProjectsbyID = async (req, res, next) => {
 
-  const id = req.params.id;
+  // const id = req.params.id;
+  const userId = req.user.id
+    // const user = await User.findById(userId);
+    // console.log(user)
 
    try {
-    const projects = await Project.find({id: id});
+    const projects = await Project.find({id: userId});
     res.json(projects);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -94,9 +97,134 @@ const deleteProject = async (req, res) => {
 };
 
 
+const postProjectImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file provided' });
+    }
+const photo = req.file.filename
+    
+    const projectId = req.params.id
+    const project = await Project.findById(projectId);
+    console.log(project)
+
+
+    if (photo) {
+      project.project_image = photo
+    }
+    await project.save();
+
+    res.json({ message: 'Project image updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const postMultipleImages = async (req, res) => {
+  try {
+    if (!req.files) {
+      return res.status(400).json({ message: 'No file provided' });
+    }
+
+    const newPhotos = req.files.map((file) => file.filename);
+
+    const projectId = req.params.id
+    const project = await Project.findById(projectId);
+    console.log(project)
+   
+    if (newPhotos) {
+      const existingImages = project.images || [];
+
+    // Combine existing images with new images
+      const updatedImages = existingImages.concat(newPhotos);
+
+    // Update the images property of the project
+      project.images = updatedImages;
+    }
+    await project.save();
+
+    res.json({ message: 'Multiple images updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getMultipleImages = async (req, res) => {
+  try {
+    const projectId = req.params.id
+    const project = await Project.findById(projectId);
+    console.log(project)
+    const images= project.images
+
+    res.json({ images });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+// const postAudioFile = async (req, res) => {
+//   try {
+//     if (!req.file) {
+//       return res.status(400).json({ message: 'No file provided' });
+//     }
+// const audio = req.file.filename
+    
+//     const projectId = req.params.id
+//     const project = await Project.findById(projectId);
+//     console.log(project)
+
+
+//     if (audio) {
+//       project.audio = audio
+//     }
+//     await project.save();
+
+//     res.json({ message: 'Audio updated successfully' });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
+
+const postMultipleAudios = async (req, res) => {
+  try {
+    if (!req.files) {
+      return res.status(400).json({ message: 'No file provided' });
+    }
+
+    const newAudios = req.files.map((file) => file.filename);
+
+    const projectId = req.params.id
+    const project = await Project.findById(projectId);
+    console.log(project)
+   
+    if (newAudios) {
+      const existingAudios = project.audios || [];
+
+    // Combine existing images with new images
+      const updatedAudios = existingAudios.concat(newAudios);
+
+    // Update the images property of the project
+      project.audios = updatedAudios;
+    }
+    await project.save();
+
+    res.json({ message: 'Multiple audios updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 module.exports = {
   postProjects,
   getProjectsbyID,
   updateProject,
   deleteProject,
+  postProjectImage,
+  postMultipleImages,
+  getMultipleImages,
+  // postAudioFile,
+  postMultipleAudios
 };
